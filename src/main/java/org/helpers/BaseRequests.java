@@ -10,11 +10,13 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.requestSpecification;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
- * Класс запроса YandexAPI.
+ * Класс запросов YandexAPI.
  */
 public final class BaseRequests {
 
@@ -41,7 +43,7 @@ public final class BaseRequests {
     private static final String YD_RESTORE = "v1/disk/trash/resources/restore";
 
     /**
-     * Oauth токен для авторизации
+     * Oauth токен для авторизации.
      */
     private static String authToken;
 
@@ -118,8 +120,7 @@ public final class BaseRequests {
                     .body("method", instanceOf(String.class),
                             "href", instanceOf(String.class),
                             "templated", instanceOf(Boolean.class));
-        }
-        else {
+        } else {
             validResp
                     .body("error", instanceOf(String.class),
                             "description", instanceOf(String.class),
@@ -171,14 +172,12 @@ public final class BaseRequests {
         if (statusCode == 204) {
             validResp
                     .body(emptyOrNullString());
-        }
-        else if (statusCode == 202) {
+        } else if (statusCode == 202) {
             validResp
                     .body("method", instanceOf(String.class),
                             "href", instanceOf(String.class),
                             "templated", instanceOf(Boolean.class));
-        }
-        else {
+        } else {
             validResp
                     .body("error", instanceOf(String.class),
                             "description", instanceOf(String.class),
@@ -271,8 +270,7 @@ public final class BaseRequests {
                     .body("method", instanceOf(String.class),
                             "href", instanceOf(String.class),
                             "templated", instanceOf(Boolean.class));
-        }
-        else {
+        } else {
             validResp
                     .body("error", instanceOf(String.class),
                             "description", instanceOf(String.class),
@@ -283,18 +281,20 @@ public final class BaseRequests {
     /**
      * Получить путь к ресурсу в корзине.
      * @param originPath путь к ресурсу до помещения в корзину
+     * @return путь к ресурсу в корзине
      */
     public static String getTrashHash(final String originPath) {
         return given()
                 .spec(requestSpecification)
                 .header(new Header("Authorization", authToken))
                 .when()
-                .get(YD_TRASH)
+                    .get(YD_TRASH)
                 .then()
-                .statusCode(200)
+                    .statusCode(200)
                 .extract()
-                .jsonPath()
-                .getString("_embedded.items.find{it.origin_path=='disk:/" + originPath + "' }.path");
+                    .jsonPath()
+                    .getString("_embedded.items.find{it.origin_path=='disk:/"
+                            + originPath + "' }.path");
     }
 
     /**
@@ -310,7 +310,7 @@ public final class BaseRequests {
     }
 
     /**
-     * Восстановить папку из корзины без указания пути
+     * Восстановить папку из корзины без указания пути.
      */
     public static void restoreFolderFromTrash() {
         restoreFolder("", 400);
@@ -330,5 +330,4 @@ public final class BaseRequests {
                             "description", instanceOf(String.class),
                             "message", instanceOf(String.class));
     }
-
 }
