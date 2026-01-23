@@ -21,6 +21,7 @@ public class AuthTests {
     @BeforeTest
     public void initSpec() {
         BaseRequests.initRequestSpecification(
+                secretsProvider.getProperty("oauth.token"),
                 envLocalProvider.getProperty("base.url"));
     }
 
@@ -30,7 +31,6 @@ public class AuthTests {
     @Test(description = "YandexAPI correct auth test", priority = 1)
     public void authCorrectTest() {
         BaseRequests.authYD(
-                secretsProvider.getProperty("oauth.token"),
                 secretsProvider.getProperty("yd.login"),
                 secretsProvider.getProperty("yd.display.name"));
     }
