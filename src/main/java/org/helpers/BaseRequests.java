@@ -16,7 +16,7 @@ import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 /**
- * Класс запросов YandexAPI.
+ * Класс запросов Yandex Disc API.
  */
 public final class BaseRequests {
 
@@ -66,7 +66,7 @@ public final class BaseRequests {
     }
 
     /**
-     * Авторизация YandexAPI с передачей Oauth токена.
+     * Авторизация с передачей Oauth токена.
      * @param userLogin ожидаемый логин аккаунта Яндекса
      * @param userDisplayName ожидаемое отображаемое имя аккаунта Яндекса
      */
@@ -85,7 +85,7 @@ public final class BaseRequests {
     }
 
     /**
-     * Авторизация YandexAPI без передачи Oauth токена.
+     * Авторизация без передачи Oauth токена.
      */
     public static void authYD() {
         given()

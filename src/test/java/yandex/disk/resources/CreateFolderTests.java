@@ -8,10 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Класс негативных тестов создания папки YandexAPI
+ * Класс тестов создания папки Yandex Disc API.
  */
 public final class CreateFolderTests extends BaseTest {
 
+    /**
+     * Стандартная папка для класса.
+     */
     private final String DEFAULT_FOLDER = "folder";
 
     @DataProvider(name = "Folder names")
@@ -29,6 +32,9 @@ public final class CreateFolderTests extends BaseTest {
         };
     }
 
+    /**
+     * Список путей папок для уборки.
+     */
     List<String> foldersOnDelete = new ArrayList<>(List.of(DEFAULT_FOLDER));
 
     /**
@@ -83,6 +89,9 @@ public final class CreateFolderTests extends BaseTest {
         BaseRequests.createFolder();
     }
 
+    /**
+     * Уборка после класса тестов.
+     */
     @AfterClass
     public void cleaning() {
         BaseRequests.clearFolders(foldersOnDelete);

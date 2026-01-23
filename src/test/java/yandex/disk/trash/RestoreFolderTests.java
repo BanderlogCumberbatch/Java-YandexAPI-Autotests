@@ -8,8 +8,14 @@ import yandex.BaseTest;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Класс тестов восстановления из корзины Yandex Disc API.
+ */
 public final class RestoreFolderTests extends BaseTest {
 
+    /**
+     * Список путей папок для уборки.
+     */
     List<String> foldersOnDelete = new ArrayList<>();
 
     /**
@@ -63,6 +69,9 @@ public final class RestoreFolderTests extends BaseTest {
         BaseRequests.restoreFolderFromTrash();
     }
 
+    /**
+     * Уборка после класса тестов.
+     */
     @AfterClass
     public void cleaning() {
         BaseRequests.clearFolders(foldersOnDelete);

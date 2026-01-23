@@ -5,12 +5,12 @@ import org.testng.annotations.Test;
 import yandex.BaseTest;
 
 /**
- * Класс для тестов авторизации YandexAPI
+ * Класс для тестов авторизации Yandex Disc API.
  */
 public final class AuthTests extends BaseTest {
 
     /**
-     * Тест авторизации YandexAPI с валидным токеном
+     * Тест авторизации YandexAPI с валидным токеном.
      */
     @Test(description = "YandexAPI correct auth test", priority = 1)
     public void authCorrectTest() {
@@ -20,7 +20,7 @@ public final class AuthTests extends BaseTest {
     }
 
     /**
-     * Тест авторизации YandexAPI без передачи токена
+     * Тест авторизации YandexAPI без передачи токена.
      */
     @Test(description = "YandexAPI incorrect auth test", priority = 2)
     public void authIncorrectTest() {

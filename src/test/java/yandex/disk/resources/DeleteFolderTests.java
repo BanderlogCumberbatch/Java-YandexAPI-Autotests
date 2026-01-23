@@ -8,10 +8,13 @@ import yandex.BaseTest;
 import java.util.List;
 
 /**
- * Класс негативных тестов удаления папки
+ * Класс тестов удаления папки Yandex Disc API.
  */
 public final class DeleteFolderTests extends BaseTest {
 
+    /**
+     * Стандартная папка для тестов класса.
+     */
     private final String DEFAULT_FOLDER = "folder";
 
     /**
@@ -48,6 +51,9 @@ public final class DeleteFolderTests extends BaseTest {
         BaseRequests.deleteFolder();
     }
 
+    /**
+     * Уборка после тестов класса.
+     */
     @AfterClass
     public void cleaning() {
         BaseRequests.clearFolders(List.of(DEFAULT_FOLDER));
