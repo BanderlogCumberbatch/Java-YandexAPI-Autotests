@@ -1,29 +1,13 @@
+package yandex.disk;
+
 import org.helpers.BaseRequests;
-import org.helpers.PropertyProvider;
-import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Test;
+import yandex.BaseTest;
 
 /**
  * Класс для тестов авторизации YandexAPI
  */
-public class AuthTests {
-
-    /**
-     * Экземпляр PropertyProvider с загруженными локальными параметрами
-     */
-    private final PropertyProvider envLocalProvider = new PropertyProvider();
-
-    /**
-     * Экземпляр PropertyProvider с загруженными секретами
-     */
-    private final PropertyProvider secretsProvider = new PropertyProvider("secrets.properties");
-
-    @BeforeTest
-    public void initSpec() {
-        BaseRequests.initRequestSpecification(
-                secretsProvider.getProperty("oauth.token"),
-                envLocalProvider.getProperty("base.url"));
-    }
+public final class AuthTests extends BaseTest {
 
     /**
      * Тест авторизации YandexAPI с валидным токеном

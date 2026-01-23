@@ -65,7 +65,7 @@ https://cloud-api.yandex.net/v1/disk/resources?path=/{folder_name}
 
 | **folder_name** |
 |:----------------|
-| folder          |
+| .folder         |
 | Папка           |
 | 123             |
 | “456”           |
@@ -133,7 +133,7 @@ https://cloud-api.yandex.net/v1/disk/resources?path=/
 Шаги:
 
 Выполнить PUT запрос:
-https://cloud-api.yandex.net/v1/disk/resources?path=/:
+[https://cloud-api.yandex.net/v1/disk/resources?path=/:](https://cloud-api.yandex.net/v1/disk/resources?path=/:)
 
 Ожидаемый результат: HTTP 400, JSON
 
@@ -189,7 +189,7 @@ https://cloud-api.yandex.net/v1/disk/resources
 
 ### 2.2.3. Удаление несуществующей папки:
 
-Предусловия: Не существует папки /folder. В заголовке запроса указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
+Предусловия: Не существует папки /folder0. В заголовке запроса указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
 
 Шаги:
 
@@ -227,18 +227,18 @@ https://cloud-api.yandex.net/v1/disk/resources
 
 ### 3.1.1. Восстановление папки:
 
-Предусловия: Папка /folder создана, а затем перемещена в корзину. В заголовке запросов указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
+Предусловия: Папка /folder0 создана, а затем перемещена в корзину. В заголовке запросов указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
 
 Шаги:
 
 1) Выполнить GET запрос:
-   https://cloud-api.yandex.net/v1/disk/trash/resources?path с телом ответа: JSON
+   https://cloud-api.yandex.net/v1/disk/trash/resources с телом ответа: JSON
 
        {
        "_embedded": { "items": [
                {
                "path": {trash_path},
-               "origin_path": "disk:/folder"
+               "origin_path": "disk:/folder0"
                }
            ] }
        }
@@ -257,18 +257,18 @@ https://cloud-api.yandex.net/v1/disk/resources
 
 ### 3.1.2. Восстановление уже существующей папки:
 
-Предусловия: Папка /folder перемещена в корзину, а затем была создана ещё одна папка  /folder. В заголовке запросов указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
+Предусловия: Папка /folder1 перемещена в корзину, а затем была создана ещё одна папка  /folder1. В заголовке запросов указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
 
 Шаги:
 
 1) Выполнить GET запрос:
-   https://cloud-api.yandex.net/v1/disk/trash/resources?path с телом ответа: JSON
+   https://cloud-api.yandex.net/v1/disk/trash/resources с телом ответа: JSON
 
        {
        "_embedded": { "items": [
                {
                "path": {trash_path},
-               "origin_path": "disk:/folder"
+               "origin_path": "disk:/folder1"
                }
            ] }
        }
@@ -284,24 +284,7 @@ https://cloud-api.yandex.net/v1/disk/resources
         "templated": boolean
     }
 
-### 3.1.3. Восстановление папки c несуществующим path в запросе:
-
-Предусловия: В заголовке запросов указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
-
-Шаги:
-
-Выполнить PUT запрос:
-https://cloud-api.yandex.net/v1/disk/trash/resources/restore?path=/
-
-Ожидаемый результат: HTTP 202, JSON
-
-    {
-        "method": string,
-        "href": string,
-        "templated": boolean
-    }
-
-### 3.1.4. Восстановление папки без Oauth токена:
+### 3.1.3. Восстановление папки без Oauth токена:
 
 Шаги:
 
@@ -314,6 +297,23 @@ https://cloud-api.yandex.net/v1/disk/trash/resources/restore?path=/folder
         "error": string,
         "description": string,
         "message": string
+    }
+
+### 3.1.4. Восстановление несуществующей папки:
+
+Предусловия: Папка /folder не существует в корзине. В заголовке запросов указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен.
+
+Шаги:
+
+Выполнить PUT запрос:
+https://cloud-api.yandex.net/v1/disk/trash/resources/restore?path=/folder
+
+Ожидаемый результат: HTTP 404, JSON
+
+    {
+        "method": string,
+        "href": string,
+        "templated": boolean
     }
 
 ### 3.1.5. Восстановление папки без path в запросе:

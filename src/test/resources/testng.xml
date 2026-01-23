@@ -2,7 +2,10 @@
 <suite name="suite">
     <test name="YandexAPI test suite">
         <classes>
-            <class name="AuthTests"/>
+            <class name="yandex.disk.AuthTests"/>
+            <class name="yandex.disk.resources.CreateFolderTests"/>
+            <class name="yandex.disk.resources.DeleteFolderTests"/>
+            <class name="yandex.disk.trash.RestoreFolderTests"/>
         </classes>
     </test>
 </suite>
