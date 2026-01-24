@@ -1,11 +1,16 @@
 package yandex.disk.resources;
 
+import io.restassured.response.ValidatableResponse;
 import org.helpers.BaseRequests;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
 import yandex.BaseTest;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.hamcrest.Matchers.emptyOrNullString;
+import static org.hamcrest.Matchers.instanceOf;
 
 /**
  * Класс тестов удаления папки Yandex Disc API.
@@ -13,17 +18,21 @@ import java.util.List;
 public final class DeleteFolderTests extends BaseTest {
 
     /**
-     * Стандартная папка для тестов класса.
+     * Список путей папок для уборки.
      */
-    private final String DEFAULT_FOLDER = "folder";
+    List<String> foldersOnDelete = new ArrayList<>();
 
     /**
      * Тест удаления папки без Oauth токена.
      */
     @Test(description = "Delete folder")
     public void deleteFolder() {
-        BaseRequests.createFolder(DEFAULT_FOLDER, 201);
-        BaseRequests.deleteFolderWithoutAuth();
+        String folderName = "folder";
+        foldersOnDelete.add(folderName);
+        BaseRequests.createFolder(folderName, 201);
+
+        ValidatableResponse validResp = BaseRequests.deleteFolder(folderName, 204);
+        validResp.body(emptyOrNullString());
     }
 
     /**
@@ -40,7 +49,13 @@ public final class DeleteFolderTests extends BaseTest {
     @Test(description = "Delete non existing folder", priority = 2)
     public void deleteNonExistingFolderTest() {
         String folderName = "folder0";
-        BaseRequests.deleteFolder(folderName, 404);
+
+        ValidatableResponse validResp = BaseRequests
+                .deleteFolder(folderName, 404);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**
@@ -48,7 +63,11 @@ public final class DeleteFolderTests extends BaseTest {
      */
     @Test(description = "Delete folder without path", priority = 3)
     public void deleteFolderWithoutPathTest() {
-        BaseRequests.deleteFolder();
+        ValidatableResponse validResp = BaseRequests.deleteFolder(400);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**
@@ -56,7 +75,6 @@ public final class DeleteFolderTests extends BaseTest {
      */
     @AfterClass
     public void cleaning() {
-        BaseRequests.clearFolders(List.of(DEFAULT_FOLDER));
-        BaseRequests.clearTrash();
+        BaseRequests.clearFolders(foldersOnDelete);
     }
 }

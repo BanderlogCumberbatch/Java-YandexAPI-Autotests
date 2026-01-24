@@ -1,5 +1,6 @@
 package yandex.disk.resources;
 
+import io.restassured.response.ValidatableResponse;
 import org.helpers.BaseRequests;
 import org.testng.annotations.*;
 import yandex.BaseTest;
@@ -7,15 +8,12 @@ import yandex.BaseTest;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.instanceOf;
+
 /**
  * Класс тестов создания папки Yandex Disc API.
  */
 public final class CreateFolderTests extends BaseTest {
-
-    /**
-     * Стандартная папка для класса.
-     */
-    private final String DEFAULT_FOLDER = "folder";
 
     @DataProvider(name = "Folder names")
     public Object[][] dpMethod() {
@@ -35,7 +33,7 @@ public final class CreateFolderTests extends BaseTest {
     /**
      * Список путей папок для уборки.
      */
-    List<String> foldersOnDelete = new ArrayList<>(List.of(DEFAULT_FOLDER));
+    List<String> foldersOnDelete = new ArrayList<>();
 
     /**
      * Тест создания папки.
@@ -43,7 +41,12 @@ public final class CreateFolderTests extends BaseTest {
     @Test(description = "Create folder", dataProvider = "Folder names")
     public void createFolderTest(Object folderName) {
         foldersOnDelete.add(folderName.toString());
-        BaseRequests.createFolder(folderName, 201);
+
+        ValidatableResponse validResp = BaseRequests.createFolder(folderName, 201);
+        validResp
+                .body("method", instanceOf(String.class),
+                        "href", instanceOf(String.class),
+                        "templated", instanceOf(Boolean.class));
     }
 
     /**
@@ -59,8 +62,15 @@ public final class CreateFolderTests extends BaseTest {
      */
     @Test(description = "Create existing folder", priority = 2)
     public void createExistingFolderTest() {
-        BaseRequests.createFolder(DEFAULT_FOLDER, 201);
-        BaseRequests.createFolder(DEFAULT_FOLDER, 409);
+        String folderName = "folder";
+        foldersOnDelete.add(folderName);
+        BaseRequests.createFolder(folderName, 201);
+
+        ValidatableResponse validResp = BaseRequests.createFolder(folderName, 409);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**
@@ -69,7 +79,11 @@ public final class CreateFolderTests extends BaseTest {
     @Test(description = "Create non existing folder", priority = 3)
     public void createNotFolderTest() {
         String folderName = "/";
-        BaseRequests.createFolder(folderName, 409);
+        ValidatableResponse validResp = BaseRequests.createFolder(folderName, 409);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**
@@ -78,7 +92,11 @@ public final class CreateFolderTests extends BaseTest {
     @Test(description = "Create incorrect folder", priority = 4)
     public void createIncorrectFolderTest() {
         String folderName = "/:";
-        BaseRequests.createFolder(folderName, 400);
+        ValidatableResponse validResp = BaseRequests.createFolder(folderName, 400);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**
@@ -86,7 +104,11 @@ public final class CreateFolderTests extends BaseTest {
      */
     @Test(description = "Create folder without path", priority = 5)
     public void createFolderWithoutPathTest() {
-        BaseRequests.createFolder();
+        ValidatableResponse validResp = BaseRequests.createFolder(400);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**
@@ -95,6 +117,5 @@ public final class CreateFolderTests extends BaseTest {
     @AfterClass
     public void cleaning() {
         BaseRequests.clearFolders(foldersOnDelete);
-        BaseRequests.clearTrash();
     }
 }

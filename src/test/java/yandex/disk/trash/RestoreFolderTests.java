@@ -1,5 +1,6 @@
 package yandex.disk.trash;
 
+import io.restassured.response.ValidatableResponse;
 import org.helpers.BaseRequests;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
@@ -7,6 +8,8 @@ import yandex.BaseTest;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.hamcrest.Matchers.instanceOf;
 
 /**
  * Класс тестов восстановления из корзины Yandex Disc API.
@@ -27,7 +30,13 @@ public final class RestoreFolderTests extends BaseTest {
         foldersOnDelete.add(folderName);
         BaseRequests.createFolder(folderName, 201);
         BaseRequests.deleteFolder(folderName, 204, false);
-        BaseRequests.restoreFolder(folderName, 201);
+
+        ValidatableResponse validResp = BaseRequests.restoreFolder(folderName, 201);
+        validResp
+                .body("method", instanceOf(String.class),
+                        "href", instanceOf(String.class),
+                        "templated", instanceOf(Boolean.class));
+
     }
 
     /**
@@ -41,7 +50,12 @@ public final class RestoreFolderTests extends BaseTest {
         BaseRequests.createFolder(folderName, 201);
         BaseRequests.deleteFolder(folderName, 204, false);
         BaseRequests.createFolder(folderName, 201);
-        BaseRequests.restoreFolder(folderName, 201);
+
+        ValidatableResponse validResp = BaseRequests.restoreFolder(folderName, 201);
+        validResp
+                .body("method", instanceOf(String.class),
+                        "href", instanceOf(String.class),
+                        "templated", instanceOf(Boolean.class));
     }
 
     /**
@@ -58,7 +72,11 @@ public final class RestoreFolderTests extends BaseTest {
     @Test(description = "Restore non existing folder", priority = 3)
     public void restoreNonExistingFolderTest() {
         String folderName = "folder";
-        BaseRequests.restoreFolderFromTrash(folderName, 404);
+        ValidatableResponse validResp = BaseRequests.restoreFolderFromTrash(folderName, 404);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**
@@ -66,7 +84,11 @@ public final class RestoreFolderTests extends BaseTest {
      */
     @Test(description = "Restore folder without path", priority = 4)
     public void restoreFolderWithoutPathTest() {
-        BaseRequests.restoreFolderFromTrash();
+        ValidatableResponse validResp = BaseRequests.restoreFolderFromTrash(400);
+        validResp
+                .body("error", instanceOf(String.class),
+                        "description", instanceOf(String.class),
+                        "message", instanceOf(String.class));
     }
 
     /**

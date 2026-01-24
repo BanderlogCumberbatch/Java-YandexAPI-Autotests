@@ -10,7 +10,6 @@ import java.util.List;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.requestSpecification;
-import static org.hamcrest.Matchers.emptyOrNullString;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.anyOf;
 import static org.hamcrest.core.IsEqual.equalTo;
@@ -70,8 +69,7 @@ public final class BaseRequests {
      * @param userLogin ожидаемый логин аккаунта Яндекса
      * @param userDisplayName ожидаемое отображаемое имя аккаунта Яндекса
      */
-    public static void authYD(
-                              final String userLogin,
+    public static void authYD(final String userLogin,
                               final String userDisplayName) {
         given()
                 .spec(requestSpecification)
@@ -103,10 +101,11 @@ public final class BaseRequests {
      * Создать папку.
      * @param folderPath путь папки
      * @param statusCode ожидаемый статус код
+     * @return проверяемый ответ
      */
-    public static void createFolder(final Object folderPath,
+    public static ValidatableResponse createFolder(final Object folderPath,
                                     final int statusCode) {
-        ValidatableResponse validResp = given()
+        return given()
                 .spec(requestSpecification)
                 .header(new Header("Authorization", authToken))
                 .when()
@@ -114,25 +113,15 @@ public final class BaseRequests {
                     .put(YD_RESOURCES)
                 .then()
                     .statusCode(statusCode);
-
-        if (statusCode == 201) {
-            validResp
-                    .body("method", instanceOf(String.class),
-                            "href", instanceOf(String.class),
-                            "templated", instanceOf(Boolean.class));
-        } else {
-            validResp
-                    .body("error", instanceOf(String.class),
-                            "description", instanceOf(String.class),
-                            "message", instanceOf(String.class));
-        }
     }
 
     /**
      * Создать папку без указания пути.
+     * @param statusCode ожидаемый статус код
+     * @return проверяемый ответ
      */
-    public static void createFolder() {
-        createFolder("", 400);
+    public static ValidatableResponse createFolder(final int statusCode) {
+        return createFolder("", statusCode);
     }
 
     /**
@@ -155,11 +144,12 @@ public final class BaseRequests {
      * @param folderPath путь папки
      * @param statusCode ожидаемый статус код
      * @param permanently true - удалить навсегда, false - переместить в корзину
+     * @return проверяемый ответ
      */
-    public static void deleteFolder(final String folderPath,
+    public static ValidatableResponse deleteFolder(final String folderPath,
                                     final int statusCode,
                                     final boolean permanently) {
-        ValidatableResponse validResp = given()
+        return given()
                 .spec(requestSpecification)
                 .header(new Header("Authorization", authToken))
                 .when()
@@ -168,38 +158,26 @@ public final class BaseRequests {
                     .delete(YD_RESOURCES)
                 .then()
                     .statusCode(statusCode);
-
-        if (statusCode == 204) {
-            validResp
-                    .body(emptyOrNullString());
-        } else if (statusCode == 202) {
-            validResp
-                    .body("method", instanceOf(String.class),
-                            "href", instanceOf(String.class),
-                            "templated", instanceOf(Boolean.class));
-        } else {
-            validResp
-                    .body("error", instanceOf(String.class),
-                            "description", instanceOf(String.class),
-                            "message", instanceOf(String.class));
-        }
     }
 
     /**
      * Удалить папку без перемещения в корзину.
      * @param folderPath путь папки
      * @param statusCode ожидаемый статус код
+     * @return проверяемый ответ
      */
-    public static void deleteFolder(final String folderPath,
+    public static ValidatableResponse deleteFolder(final String folderPath,
                                     final int statusCode) {
-        deleteFolder(folderPath, statusCode, true);
+        return deleteFolder(folderPath, statusCode, true);
     }
 
     /**
      * Удалить папку без указания пути.
+     * @param statusCode ожидаемый статус код
+     * @return проверяемый ответ
      */
-    public static void deleteFolder() {
-        deleteFolder("", 400);
+    public static ValidatableResponse deleteFolder(final int statusCode) {
+        return deleteFolder("", statusCode);
     }
 
     /**
@@ -252,11 +230,11 @@ public final class BaseRequests {
      * Восстановить папку из корзины, используя путь в корзине.
      * @param trashPath путь папки в корзине
      * @param statusCode ожидаемый статус код
+     * @return проверяемый ответ
      */
-    public static void restoreFolderFromTrash(final String trashPath,
+    public static ValidatableResponse restoreFolderFromTrash(final String trashPath,
                                      final int statusCode) {
-
-        ValidatableResponse validResp = given()
+        return given()
                 .spec(requestSpecification)
                 .header(new Header("Authorization", authToken))
                 .when()
@@ -264,18 +242,6 @@ public final class BaseRequests {
                 .put(YD_RESTORE)
                 .then()
                 .statusCode(statusCode);
-
-        if (statusCode == 201 || statusCode == 202) {
-            validResp
-                    .body("method", instanceOf(String.class),
-                            "href", instanceOf(String.class),
-                            "templated", instanceOf(Boolean.class));
-        } else {
-            validResp
-                    .body("error", instanceOf(String.class),
-                            "description", instanceOf(String.class),
-                            "message", instanceOf(String.class));
-        }
     }
 
     /**
@@ -301,19 +267,22 @@ public final class BaseRequests {
      * Восстановить папку из корзины.
      * @param folderPath путь папки до помещения в корзину
      * @param statusCode ожидаемый статус код
+     * @return проверяемый ответ
      */
-    public static void restoreFolder(final String folderPath,
+    public static ValidatableResponse restoreFolder(final String folderPath,
                                      final int statusCode) {
         String trashHashPath = getTrashHash(folderPath);
 
-        restoreFolderFromTrash(trashHashPath, statusCode);
+        return restoreFolderFromTrash(trashHashPath, statusCode);
     }
 
     /**
      * Восстановить папку из корзины без указания пути.
+     * @param statusCode ожидаемый статус код
+     * @return проверяемый ответ
      */
-    public static void restoreFolderFromTrash() {
-        restoreFolder("", 400);
+    public static ValidatableResponse restoreFolderFromTrash(final int statusCode) {
+        return restoreFolder("", statusCode);
     }
 
     /**
