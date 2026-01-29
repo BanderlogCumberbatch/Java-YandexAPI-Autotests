@@ -5,6 +5,7 @@
             <class name="yandex.disk.AuthTests"/>
             <class name="yandex.disk.resources.CreateFolderTests"/>
             <class name="yandex.disk.resources.DeleteFolderTests"/>
+            <class name="yandex.disk.resources.UploadAndCopyFIleTest"/>
             <class name="yandex.disk.trash.RestoreFolderTests"/>
         </classes>
     </test>

@@ -6,6 +6,7 @@ import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import io.restassured.response.ValidatableResponse;
 
+import java.io.File;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -30,6 +31,16 @@ public final class BaseRequests {
      * API для взаимодействия с ресурсами.
      */
     private static final String YD_RESOURCES = "v1/disk/resources";
+
+    /**
+     * API для загрузки файлов на диск.
+     */
+    private static final String YD_UPLOAD = "v1/disk/resources/upload";
+
+    /**
+     * API для копирования файлов.
+     */
+    private static final String YD_COPY = "v1/disk/resources/copy";
 
     /**
      * API для взаимодействия с корзиной.
@@ -98,7 +109,7 @@ public final class BaseRequests {
     }
 
     /**
-     * Создать папку.
+     * Создать папку с проверяемым ответом.
      * @param folderPath путь папки
      * @param statusCode ожидаемый статус код
      * @return проверяемый ответ
@@ -122,6 +133,14 @@ public final class BaseRequests {
      */
     public static ValidatableResponse createFolder(final int statusCode) {
         return createFolder("", statusCode);
+    }
+
+    /**
+     * Создать папку.
+     * @param folderPath путь папки
+     */
+    public static void createFolder(final String folderPath) {
+        createFolder(folderPath, 201);
     }
 
     /**
@@ -209,7 +228,7 @@ public final class BaseRequests {
                         .param("permanently", true)
                         .delete(YD_RESOURCES)
                     .then()
-                        .statusCode(anyOf(equalTo(204), equalTo(404)));
+                        .statusCode(anyOf(equalTo(204), equalTo(202), equalTo(404)));
         }
     }
 
@@ -298,5 +317,44 @@ public final class BaseRequests {
                     .body("error", instanceOf(String.class),
                             "description", instanceOf(String.class),
                             "message", instanceOf(String.class));
+    }
+
+    /**
+     * Получить URL на PUT запрос для загрузки файла.
+     * @param path путь к создаваемому файлу и его имя
+     * @return href URL на PUT запрос загрузки файла
+     */
+    public static String getUploadUrl(String path) {
+        return given()
+                .spec(requestSpecification)
+                .header(new Header("Authorization", authToken))
+                .when()
+                    .param("path", path)
+                    .get(YD_UPLOAD)
+                .then()
+                    .statusCode(200)
+                .extract()
+                    .jsonPath()
+                    .getString("href");
+    }
+
+    /**
+     * Загрузить файл на диск.
+     * @param filePath путь к загружаемому файлу
+     * @param diskPath желаемый путь к файлу в облаке
+     * @param statusCode ожидаемый статус код
+     */
+    public static void uploadFile(String filePath, String diskPath, int statusCode) {
+        String uploadUrl = getUploadUrl(diskPath);
+
+        given()
+                .spec(requestSpecification)
+                .contentType(ContentType.BINARY)
+                .body(new File(filePath))
+                .header(new Header("Authorization", authToken))
+                .when()
+                    .put(uploadUrl)
+                .then()
+                    .statusCode(statusCode);
     }
 }
