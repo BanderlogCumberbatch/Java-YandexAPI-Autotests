@@ -10,16 +10,16 @@ import lombok.Setter;
 public class SuccessResponse {
 
     /**
-     * Ошибка.
+     * Метод.
      */
     @Builder.Default
-    private String method = "string";
+    private String method = null;
 
     /**
      * Описание.
      */
     @Builder.Default
-    private String href = "string";
+    private String href = null;
 
     /**
      * Сообщение.

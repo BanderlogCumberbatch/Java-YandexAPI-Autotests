@@ -13,17 +13,17 @@ public class ErrorResponse {
      * Ошибка.
      */
     @Builder.Default
-    private String error = "string";
+    private String error = null;
 
     /**
      * Описание.
      */
     @Builder.Default
-    private String description = "string";
+    private String description = null;
 
     /**
      * Сообщение.
      */
     @Builder.Default
-    private String message = "string";
+    private String message = null;
 }

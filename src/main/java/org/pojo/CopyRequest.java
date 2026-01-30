@@ -13,13 +13,13 @@ public class CopyRequest {
      * Ошибка.
      */
     @Builder.Default
-    private String from = "string";
+    private String from = null;
 
     /**
      * Описание.
      */
     @Builder.Default
-    private String path = "string";
+    private String path = null;
 
     /**
      * Сообщение.
