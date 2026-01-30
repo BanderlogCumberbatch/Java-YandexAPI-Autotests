@@ -2,7 +2,9 @@ package yandex.disk.resources;
 
 import io.restassured.response.ValidatableResponse;
 import org.helpers.BaseRequests;
-import org.testng.annotations.*;
+import org.testng.annotations.Test;
+import org.testng.annotations.DataProvider;
+import org.testng.annotations.AfterClass;
 import yandex.BaseTest;
 
 import java.util.ArrayList;

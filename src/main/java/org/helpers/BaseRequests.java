@@ -4,8 +4,12 @@ import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import io.restassured.response.ResponseBodyExtractionOptions;
 import io.restassured.response.ValidatableResponse;
+import org.pojo.CopyRequest;
+import org.pojo.SuccessResponse;
 
+import java.io.File;
 import java.util.List;
 
 import static io.restassured.RestAssured.given;
@@ -30,6 +34,21 @@ public final class BaseRequests {
      * API для взаимодействия с ресурсами.
      */
     private static final String YD_RESOURCES = "v1/disk/resources";
+
+    /**
+     * API для загрузки файлов на диск.
+     */
+    private static final String YD_UPLOAD = "v1/disk/resources/upload";
+
+    /**
+     * API для копирования файлов.
+     */
+    private static final String YD_COPY = "v1/disk/resources/copy";
+
+    /**
+     * API для загрузки файлов с диска.
+     */
+    private static final String YD_DOWNLOAD = "v1/disk/resources/download";
 
     /**
      * API для взаимодействия с корзиной.
@@ -98,9 +117,9 @@ public final class BaseRequests {
     }
 
     /**
-     * Создать папку.
+     * Создать папку с проверяемым ответом.
      * @param folderPath путь папки
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @return проверяемый ответ
      */
     public static ValidatableResponse createFolder(final Object folderPath,
@@ -117,11 +136,19 @@ public final class BaseRequests {
 
     /**
      * Создать папку без указания пути.
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @return проверяемый ответ
      */
     public static ValidatableResponse createFolder(final int statusCode) {
         return createFolder("", statusCode);
+    }
+
+    /**
+     * Создать папку.
+     * @param folderPath путь папки
+     */
+    public static void createFolder(final String folderPath) {
+        createFolder(folderPath, 201);
     }
 
     /**
@@ -142,7 +169,7 @@ public final class BaseRequests {
     /**
      * Удалить папку.
      * @param folderPath путь папки
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @param permanently true - удалить навсегда, false - переместить в корзину
      * @return проверяемый ответ
      */
@@ -163,7 +190,7 @@ public final class BaseRequests {
     /**
      * Удалить папку без перемещения в корзину.
      * @param folderPath путь папки
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @return проверяемый ответ
      */
     public static ValidatableResponse deleteFolder(final String folderPath,
@@ -173,7 +200,7 @@ public final class BaseRequests {
 
     /**
      * Удалить папку без указания пути.
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @return проверяемый ответ
      */
     public static ValidatableResponse deleteFolder(final int statusCode) {
@@ -209,7 +236,7 @@ public final class BaseRequests {
                         .param("permanently", true)
                         .delete(YD_RESOURCES)
                     .then()
-                        .statusCode(anyOf(equalTo(204), equalTo(404)));
+                        .statusCode(anyOf(equalTo(204), equalTo(202), equalTo(404)));
         }
     }
 
@@ -229,7 +256,7 @@ public final class BaseRequests {
     /**
      * Восстановить папку из корзины, используя путь в корзине.
      * @param trashPath путь папки в корзине
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @return проверяемый ответ
      */
     public static ValidatableResponse restoreFolderFromTrash(final String trashPath,
@@ -266,7 +293,7 @@ public final class BaseRequests {
     /**
      * Восстановить папку из корзины.
      * @param folderPath путь папки до помещения в корзину
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @return проверяемый ответ
      */
     public static ValidatableResponse restoreFolder(final String folderPath,
@@ -278,7 +305,7 @@ public final class BaseRequests {
 
     /**
      * Восстановить папку из корзины без указания пути.
-     * @param statusCode ожидаемый статус код
+     * @param statusCode ожидаемый статус-код ответа
      * @return проверяемый ответ
      */
     public static ValidatableResponse restoreFolderFromTrash(final int statusCode) {
@@ -298,5 +325,86 @@ public final class BaseRequests {
                     .body("error", instanceOf(String.class),
                             "description", instanceOf(String.class),
                             "message", instanceOf(String.class));
+    }
+
+    /**
+     * Получить тело ответа с PUT запросом для загрузки файла на диск.
+     * @param path путь к создаваемому файлу и его имя
+     * @return Data-класс с href URL на PUT запрос загрузки файла
+     */
+    public static SuccessResponse getUploadUrl(String path) {
+        return given()
+                .spec(requestSpecification)
+                .header(new Header("Authorization", authToken))
+                .when()
+                    .param("path", path)
+                    .get(YD_UPLOAD)
+                .then()
+                    .statusCode(200)
+                .extract()
+                    .body()
+                    .as(SuccessResponse.class);
+    }
+
+    /**
+     * Загрузить файл на диск.
+     * @param filePath путь к загружаемому файлу
+     * @param diskPath желаемый путь к файлу в облаке
+     * @param statusCode ожидаемый статус-код ответа
+     */
+    public static void uploadFile(String filePath, String diskPath, int statusCode) {
+        String uploadUrl = getUploadUrl(diskPath)
+                .getHref();
+
+        given()
+                .spec(requestSpecification)
+                .contentType(ContentType.BINARY)
+                .body(new File(filePath))
+                .header(new Header("Authorization", authToken))
+                .when()
+                    .put(uploadUrl)
+                .then()
+                    .statusCode(statusCode);
+    }
+
+    /**
+     * Копировать файл.
+     * @param copyRequest Data-класс запроса на копирование
+     * @param statusCode ожидаемый статус-код ответа
+     * @return опции для сериализации тела ответа
+     */
+    public static ResponseBodyExtractionOptions copyFile(CopyRequest copyRequest, int statusCode) {
+        return given()
+                .spec(requestSpecification)
+                .header(new Header("Authorization", authToken))
+                .queryParam("from", copyRequest.getFrom())
+                .queryParam("path", copyRequest.getPath())
+                .queryParam("overwrite", copyRequest.getOverwrite())
+                .when()
+                    .post(YD_COPY)
+                .then()
+                    .statusCode(statusCode)
+                .extract()
+                .body();
+    }
+
+    /**
+     * Получить телом ответа с URL для загрузки файла с диска.
+     * @param path путь к создаваемому файлу и его имя
+     * @param statusCode ожидаемый статус-код ответа
+     * @return Data-класс с href URL для загрузки файла
+     */
+    public static SuccessResponse getDownloadUrl(String path, int statusCode) {
+        return given()
+                .spec(requestSpecification)
+                .header(new Header("Authorization", authToken))
+                .when()
+                    .param("path", path)
+                    .get(YD_DOWNLOAD)
+                .then()
+                    .statusCode(statusCode)
+                .extract()
+                    .body()
+                    .as(SuccessResponse.class);
     }
 }
