@@ -8,7 +8,8 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 import yandex.BaseTest;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -39,7 +40,7 @@ public final class DownloadFileTest extends BaseTest {
     public void downloadFileTest() {
         String fileName = "data.txt";
         String diskPath = "sdet_data/" + fileName;
-        String downloadUrl = BaseRequests.getDownloadUrl(diskPath)
+        String downloadUrl = BaseRequests.getDownloadUrl(diskPath, 200)
                 .getHref();
 
         String downloadedFileName = "downloaded_data.txt";

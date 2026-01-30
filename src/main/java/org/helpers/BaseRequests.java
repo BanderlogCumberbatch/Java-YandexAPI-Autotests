@@ -391,9 +391,10 @@ public final class BaseRequests {
     /**
      * Получить телом ответа с URL для загрузки файла с диска.
      * @param path путь к создаваемому файлу и его имя
+     * @param statusCode ожидаемый статус-код ответа
      * @return Data-класс с href URL для загрузки файла
      */
-    public static SuccessResponse getDownloadUrl(String path) {
+    public static SuccessResponse getDownloadUrl(String path, int statusCode) {
         return given()
                 .spec(requestSpecification)
                 .header(new Header("Authorization", authToken))
@@ -401,7 +402,7 @@ public final class BaseRequests {
                     .param("path", path)
                     .get(YD_DOWNLOAD)
                 .then()
-                    .statusCode(200)
+                    .statusCode(statusCode)
                 .extract()
                     .body()
                     .as(SuccessResponse.class);
