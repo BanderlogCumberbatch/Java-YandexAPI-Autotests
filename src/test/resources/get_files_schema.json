@@ -18,16 +18,19 @@
               "type": "string"
             },
             "type": {
-              "type": "string"
+              "type": "string",
+              "enum": ["file"]
             },
             "name": {
               "type": "string"
             },
             "created": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             },
             "modified": {
-              "type": "string"
+              "type": "string",
+              "format": "date-time"
             },
             "size": {
               "type": "integer"
@@ -36,10 +39,12 @@
               "type": "string"
             },
             "md5": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^.{32}$"
             },
             "sha256": {
-              "type": "string"
+              "type": "string",
+              "pattern": "^.{64}$"
             },
             "preview": {
               "type": "string"
@@ -87,7 +92,8 @@
               ]
             },
             "media_type": {
-              "type": "string"
+              "type": "string",
+              "enum": ["image", "document", "compressed", "video", "executable"]
             },
             "file": {
               "type": "string"
