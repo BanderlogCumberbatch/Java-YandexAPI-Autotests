@@ -51,6 +51,11 @@ public final class BaseRequests {
     private static final String YD_DOWNLOAD = "v1/disk/resources/download";
 
     /**
+     * API для получения списка файлов.
+     */
+    private static final String YD_FILES = "v1/disk/resources/files";
+
+    /**
      * API для взаимодействия с корзиной.
      */
     private static final String YD_TRASH = "v1/disk/trash/resources";
@@ -117,10 +122,10 @@ public final class BaseRequests {
     }
 
     /**
-     * Создать папку с проверяемым ответом.
+     * Создать папку с желаемым проверяемым ответом.
      * @param folderPath путь папки
      * @param statusCode ожидаемый статус-код ответа
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse createFolder(final Object folderPath,
                                     final int statusCode) {
@@ -137,7 +142,7 @@ public final class BaseRequests {
     /**
      * Создать папку без указания пути.
      * @param statusCode ожидаемый статус-код ответа
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse createFolder(final int statusCode) {
         return createFolder("", statusCode);
@@ -171,7 +176,7 @@ public final class BaseRequests {
      * @param folderPath путь папки
      * @param statusCode ожидаемый статус-код ответа
      * @param permanently true - удалить навсегда, false - переместить в корзину
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse deleteFolder(final String folderPath,
                                     final int statusCode,
@@ -191,7 +196,7 @@ public final class BaseRequests {
      * Удалить папку без перемещения в корзину.
      * @param folderPath путь папки
      * @param statusCode ожидаемый статус-код ответа
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse deleteFolder(final String folderPath,
                                     final int statusCode) {
@@ -201,7 +206,7 @@ public final class BaseRequests {
     /**
      * Удалить папку без указания пути.
      * @param statusCode ожидаемый статус-код ответа
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse deleteFolder(final int statusCode) {
         return deleteFolder("", statusCode);
@@ -250,14 +255,14 @@ public final class BaseRequests {
                 .when()
                     .delete(YD_TRASH)
                 .then()
-                    .statusCode(anyOf(equalTo(204), equalTo(404)));
+                    .statusCode(anyOf(equalTo(204), equalTo(202), equalTo(404)));
     }
 
     /**
-     * Восстановить папку из корзины, используя путь в корзине.
+     * Восстановить папку из корзины используя путь в корзине.
      * @param trashPath путь папки в корзине
      * @param statusCode ожидаемый статус-код ответа
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse restoreFolderFromTrash(final String trashPath,
                                      final int statusCode) {
@@ -294,7 +299,7 @@ public final class BaseRequests {
      * Восстановить папку из корзины.
      * @param folderPath путь папки до помещения в корзину
      * @param statusCode ожидаемый статус-код ответа
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse restoreFolder(final String folderPath,
                                      final int statusCode) {
@@ -306,7 +311,7 @@ public final class BaseRequests {
     /**
      * Восстановить папку из корзины без указания пути.
      * @param statusCode ожидаемый статус-код ответа
-     * @return проверяемый ответ
+     * @return Проверяемый ответ
      */
     public static ValidatableResponse restoreFolderFromTrash(final int statusCode) {
         return restoreFolder("", statusCode);
@@ -347,7 +352,7 @@ public final class BaseRequests {
     }
 
     /**
-     * Загрузить файл на диск.
+     * Загрузить файл на диск с желаемым проверяемым ответом.
      * @param filePath путь к загружаемому файлу
      * @param diskPath желаемый путь к файлу в облаке
      * @param statusCode ожидаемый статус-код ответа
@@ -365,6 +370,32 @@ public final class BaseRequests {
                     .put(uploadUrl)
                 .then()
                     .statusCode(statusCode);
+    }
+
+    /**
+     * Загрузить файл на диск.
+     * @param filePath путь к загружаемому файлу
+     * @param diskPath желаемый путь к файлу в облаке
+     */
+    public static void uploadFile(String filePath, String diskPath) {
+        uploadFile(filePath, diskPath, 201);
+    }
+
+    /**
+     * Загрузить пустой файл на диск.
+     * @param diskPath желаемый путь к файлу в облаке
+     */
+    public static void uploadFile(String diskPath) {
+        String uploadUrl = getUploadUrl(diskPath)
+                .getHref();
+
+        given()
+                .spec(requestSpecification)
+                .header(new Header("Authorization", authToken))
+                .when()
+                    .put(uploadUrl)
+                .then()
+                    .statusCode(201);
     }
 
     /**
@@ -406,5 +437,19 @@ public final class BaseRequests {
                 .extract()
                     .body()
                     .as(SuccessResponse.class);
+    }
+
+    /**
+     * Получить список файлов упорядоченный по имени.
+     * @return Проверяемый ответ
+     */
+    public static ValidatableResponse getFiles(int statusCode) {
+        return given()
+                .spec(requestSpecification)
+                .header(new Header("Authorization", authToken))
+                .when()
+                    .get(YD_FILES)
+                .then()
+                    .statusCode(statusCode);
     }
 }

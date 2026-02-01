@@ -18,32 +18,51 @@ import java.util.List;
  * Класс теста скачивания файлов на устройство Yandex Disc API.
  */
 public final class DownloadFileTest extends BaseTest {
+
+    /**
+     * Имя создаваемой для теста папки
+     */
+    String folderName;
+
+    /**
+     * Имя создаваемого для теста файла на диске
+     */
+    String fileName;
+
+    /**
+     * Путь до создаваемого для теста файла на диске
+     */
+    String diskPath;
+
+    /**
+     * Имя загружаемого с диска тестового файла на устройстве
+     */
+    String downloadedFileName;
+
     /**
      * Предусловия для теста.
      */
     @BeforeClass
     public void preconditions() {
-        String folderName = "sdet_data/";
-        String fileName = "data.txt";
-        String diskPath = folderName + fileName;
+        folderName = "sdet_data";
+        fileName = "data.txt";
+        diskPath = folderName + "/" + fileName;
         BaseRequests.createFolder(folderName);
 
         FilesHelper.createDataFile(fileName);
 
-        BaseRequests.uploadFile(fileName, diskPath, 201);
+        BaseRequests.uploadFile(fileName, diskPath);
     }
 
     /**
      * Тест скачивания файла с диска и его сравнения с оригинальным файлом, загруженным на диск.
      */
-    @Test(description = "Download file test")
+    @Test(description = "Download file")
     public void downloadFileTest() {
-        String fileName = "data.txt";
-        String diskPath = "sdet_data/" + fileName;
         String downloadUrl = BaseRequests.getDownloadUrl(diskPath, 200)
                 .getHref();
 
-        String downloadedFileName = "downloaded_data.txt";
+        downloadedFileName = "downloaded_data.txt";
         FilesHelper.downloadFile(downloadUrl, downloadedFileName);
 
         long l;
@@ -61,8 +80,8 @@ public final class DownloadFileTest extends BaseTest {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @AfterClass
     public void cleaning() {
-        BaseRequests.clearFolders(List.of("sdet_data/"));
-        new File("data.txt").delete();
-        new File("downloaded_data.txt").delete();
+        BaseRequests.clearFolders(List.of(folderName));
+        new File(fileName).delete();
+        new File(downloadedFileName).delete();
     }
 }

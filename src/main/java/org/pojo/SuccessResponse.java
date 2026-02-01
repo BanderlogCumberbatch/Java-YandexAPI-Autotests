@@ -1,25 +1,27 @@
 package org.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @Builder
+@Jacksonized
+@JsonIgnoreProperties({"operation_id"})
 public class SuccessResponse {
 
     /**
      * Метод.
      */
-    @Builder.Default
-    private String method = null;
+    private String method;
 
     /**
      * Описание.
      */
-    @Builder.Default
-    private String href = null;
+    private String href;
 
     /**
      * Сообщение.

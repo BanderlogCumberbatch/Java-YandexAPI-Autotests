@@ -1,29 +1,28 @@
 package org.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @Builder
+@Jacksonized
 public class ErrorResponse {
 
     /**
      * Ошибка.
      */
-    @Builder.Default
-    private String error = null;
+    private String error;
 
     /**
      * Описание.
      */
-    @Builder.Default
-    private String description = null;
+    private String description;
 
     /**
      * Сообщение.
      */
-    @Builder.Default
-    private String message = null;
+    private String message;
 }

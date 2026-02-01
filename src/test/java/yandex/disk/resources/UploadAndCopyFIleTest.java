@@ -20,12 +20,29 @@ import java.util.List;
 public final class UploadAndCopyFIleTest extends BaseTest {
 
     /**
+     * Имя создаваемой папки для теста загрузки файла на диск
+     */
+    String inputFolderName;
+
+    /**
+     * Имя создаваемого для тестов файла на диске
+     */
+    String fileName;
+
+    /**
+     * Имя создаваемой папки для теста копирования
+     */
+    String outputFolderName;
+
+    /**
      * Создание папок для тестов.
      */
     @BeforeClass
     public void createFolders() {
-        BaseRequests.createFolder("input_data/");
-        BaseRequests.createFolder("output_data/");
+        inputFolderName = "input_data";
+        outputFolderName = "output_data";
+        BaseRequests.createFolder(inputFolderName);
+        BaseRequests.createFolder(outputFolderName);
     }
 
     /**
@@ -33,13 +50,13 @@ public final class UploadAndCopyFIleTest extends BaseTest {
      */
     @Test(description = "Upload and copy file")
     public void uploadAndCopyFileTest() {
-        String fileName = "data.txt";
-        String diskPath = "input_data/" + fileName;
+        fileName = "data.txt";
+        String diskPath = inputFolderName + "/" + fileName;
         FilesHelper.createDataFile(fileName);
 
         BaseRequests.uploadFile(fileName, diskPath, 201);
 
-        String copyPath = "output_data/" + fileName;
+        String copyPath = outputFolderName + "/" + fileName;
         CopyRequest copyRequest = CopyRequest.builder()
                 .from(diskPath)
                 .path(copyPath)
@@ -69,7 +86,7 @@ public final class UploadAndCopyFIleTest extends BaseTest {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @AfterClass
     public void cleaning() {
-        BaseRequests.clearFolders(List.of("input_data/", "output_data/"));
-        new File("data.txt").delete();
+        BaseRequests.clearFolders(List.of(inputFolderName, outputFolderName));
+        new File(fileName).delete();
     }
 }

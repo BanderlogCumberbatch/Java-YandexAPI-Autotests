@@ -1,25 +1,25 @@
 package org.pojo;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @Builder
+@Jacksonized
 public class CopyRequest {
 
     /**
      * Ошибка.
      */
-    @Builder.Default
-    private String from = null;
+    private String from;
 
     /**
      * Описание.
      */
-    @Builder.Default
-    private String path = null;
+    private String path;
 
     /**
      * Сообщение.
