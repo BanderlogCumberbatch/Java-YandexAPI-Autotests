@@ -2,3 +2,6 @@
 src/test/resources/secrets.properties
 target
 allure-results
+
+data.txt
+downloaded_data.txt

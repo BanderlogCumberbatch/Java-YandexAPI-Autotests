@@ -19,6 +19,9 @@ public class BaseTest {
      */
     protected final PropertyProvider secretsProvider = new PropertyProvider("secrets.properties");
 
+    /**
+     * Инициализация спецификации запросов перед тестами.
+     */
     @BeforeTest
     public void initSpec() {
         BaseRequests.initRequestSpecification(
