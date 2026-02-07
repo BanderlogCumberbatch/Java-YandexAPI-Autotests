@@ -220,6 +220,21 @@ https://cloud-api.yandex.net/v1/disk/resources
         "message": string
     }
 
+### 2.3. Эндпоинт /files GET
+
+### 2.3.1 Получения списка файлов
+
+Предусловия: Создана папка /files и в неё загружен файл file.txt. В заголовке запроса указано {Authorization: OAuth {auth_token}} где {auth_token} - корректный OAuth токен. {yd_login} - логин аккаунта Яндекс, {yd_name} - отображаемое имя в аккаунте Яндекса.
+
+Шаги:
+
+Выполнить GET запрос:
+https://cloud-api.yandex.net/v1/disk/resources/files
+
+Ожидаемый результат:
+1) HTTP 200.
+2) JSON соответствует схеме get_files_schema.json в папке resources.
+
 
 ## 3. Тест-кейсы REST API v1/disk/trash/resources/restore
 
