@@ -4,6 +4,9 @@ import lombok.Getter;
 import java.io.InputStream;
 import java.util.Properties;
 
+/**
+ * Класс для получения параметров из .properties-файла (без стандартного instance).
+ */
 @Getter
 public final class PropertyProvider {
 
